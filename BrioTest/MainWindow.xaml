@@ -1,0 +1,72 @@
+﻿<Window x:Class="BrioTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BrioTest"
+        mc:Ignorable="d"
+        Title="Brio CV Test" Height="398" Width="300">
+    <Grid>
+        <StackPanel>
+            <Button
+                Margin="15"
+                Command="{Binding OpenSourceCommand}">
+                Open Source
+            </Button>
+
+            <CheckBox
+                Margin="15"
+                Content="Landscape paper orientation"
+                IsChecked="{Binding IsLandscapePaperOrientation}"/>
+
+            <StackPanel 
+                Orientation="Horizontal"
+                Margin="15">
+                <TextBlock>X cam position: </TextBlock>
+                <TextBlock
+                    Text="{Binding XPos}"/>
+            </StackPanel>
+
+            <StackPanel 
+                Orientation="Horizontal"
+                Margin="15">
+                <TextBlock>Y cam position: </TextBlock>
+                <TextBlock
+                    Text="{Binding YPos}"/>
+            </StackPanel>
+
+            <StackPanel 
+                Orientation="Horizontal"
+                Margin="15">
+                <TextBlock>Z cam position: </TextBlock>
+                <TextBlock
+                    Text="{Binding ZPos}"/>
+            </StackPanel>
+
+            <StackPanel 
+                Orientation="Horizontal"
+                Margin="15">
+                <TextBlock>Alpha: </TextBlock>
+                <TextBlock
+                    Text="{Binding Alpha}"/>
+            </StackPanel>
+
+            <StackPanel 
+                Orientation="Horizontal"
+                Margin="15">
+                <TextBlock>Beta:</TextBlock>
+                <TextBlock
+                    Text="{Binding Beta}"/>
+            </StackPanel>
+
+            <StackPanel 
+                Orientation="Horizontal"
+                Margin="15">
+                <TextBlock>Gamma: </TextBlock>
+                <TextBlock
+                    Text="{Binding Gamma}"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>
+
