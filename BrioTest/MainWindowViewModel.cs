@@ -101,17 +101,32 @@ namespace BrioTest
 
         private void CheckCenterPoint(ICoordCalculator calculator)
         {
-            Point3f point;
+            Point3f pointZero;
+            Point3f pointX;
+            Point3f pointY;
+            Point3f pointZ;
             if (IsLandscapePaperOrientation)
             {
-               point = new Point3f(148.5f, 105, 0);
+                pointZero = new Point3f(148.5f, 105, 0);
             }
             else
             {
-                point = new Point3f(105, 148.5f, 0);
+                pointZero = new Point3f(105, 148.5f, 0);
             }
-            Point2f projected = calculator.ProjectPoint(point);
-            mFrame.DrawMarker((int)projected.X, (int)projected.Y, Scalar.Red);
+
+            int axesLenght = 30;
+            pointX = new Point3f(pointZero.X + axesLenght, pointZero.Y, pointZero.Z);
+            pointY = new Point3f(pointZero.X, pointZero.Y + axesLenght, pointZero.Z);
+            pointZ = new Point3f(pointZero.X, pointZero.Y, pointZero.Z - axesLenght);
+
+            Point2f projectedZero = calculator.ProjectPoint(pointZero);
+            Point2f projectedX = calculator.ProjectPoint(pointX);
+            Point2f projectedY = calculator.ProjectPoint(pointY);
+            Point2f projectedZ = calculator.ProjectPoint(pointZ);
+            
+            mFrame.Line(projectedZero, projectedX, Scalar.Red);
+            mFrame.Line(projectedZero, projectedY, Scalar.Green);
+            mFrame.Line(projectedZero, projectedZ, Scalar.Blue);
         }
 
         private void ConvertResult(double[] trVec, double[] rotVec)
