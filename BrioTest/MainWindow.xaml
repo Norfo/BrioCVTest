@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BrioTest"
         mc:Ignorable="d"
-        Title="Brio CV Test" Height="398" Width="300">
+        Title="Brio CV Test" Height="448" Width="300">
     <Grid>
         <StackPanel>
             <Button
@@ -18,6 +18,12 @@
                 Margin="15"
                 Content="Landscape paper orientation"
                 IsChecked="{Binding IsLandscapePaperOrientation}"/>
+
+            <Button
+                Margin="15"
+                Command="{Binding CountAutomaticallyCommand}">
+                Detect and calculate automatically
+            </Button>
 
             <StackPanel 
                 Orientation="Horizontal"

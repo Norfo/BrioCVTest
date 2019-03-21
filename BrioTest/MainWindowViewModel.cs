@@ -53,6 +53,11 @@ namespace BrioTest
             get { return new RelayCommand((object obj) => OpenSource()); }
         }
 
+        public ICommand CountAutomaticallyCommand
+        {
+            get { return new RelayCommand((object obj) => CountAutomatically()); }
+        } 
+
         private void OpenSource()
         {
             mDialogService = new DefaultDialogService();
@@ -68,16 +73,47 @@ namespace BrioTest
         }
 
         private void ShowFrame(ISourceable source)
-        {            
+        {
             FrameNumber = 0;
 
-            while (source.HaveNewFrame())
+            if (source.HaveNewFrame())
             {
                 mFrame = source.GetFrame();
                 FrameNumber++;
                 mWin.ShowImage(mFrame);
                 Cv2.WaitKey(33);
             }
+        }
+
+        private void CountAutomatically()
+        {
+            if (mFrame == null)
+            {
+                return;
+            }
+            IPreProcessor preProcessor = new KMeansPreProcessor();
+            Mat preProcced = preProcessor.Process(mFrame.Clone());
+            ContourAnalyzer contourAnalyzer = new ContourAnalyzer(preProcced);
+
+            mImagePoints = contourAnalyzer.GetCorners();
+            for (int i = 0; i < mImagePoints.Count; i++)
+            {
+                if (i == mImagePoints.Count -1)
+                {
+                    mFrame.Line(mImagePoints[0], mImagePoints[i], Scalar.Red);
+                }
+                else
+                {
+                    mFrame.Line(mImagePoints[i], mImagePoints[i + 1], Scalar.Red);
+                }
+
+                mFrame.PutText(i.ToString(), mImagePoints[i], HersheyFonts.HersheySimplex, 1, Scalar.Red);
+            }
+
+            Process();
+
+            mWin.ShowImage(mFrame);
+            Cv2.WaitKey(33);
         }
 
         private void Process()
@@ -89,9 +125,10 @@ namespace BrioTest
                                                         new Point3f(297, 0, 0),
                                                         new Point3f(297, 210, 0),
                                                         new Point3f(0, 210, 0)};
-            }
+            }          
 
             ICoordCalculator coordCalculator = new SimpleCoordCalculator();
+            
             coordCalculator.Process(mWorldPoints, mImagePoints, mFrame.Size());
             double[] posVec = coordCalculator.GetCameraPosition();
             double[] rotVec = coordCalculator.GetCameraRotation();
@@ -123,7 +160,7 @@ namespace BrioTest
             Point2f projectedX = calculator.ProjectPoint(pointX);
             Point2f projectedY = calculator.ProjectPoint(pointY);
             Point2f projectedZ = calculator.ProjectPoint(pointZ);
-            
+
             mFrame.Line(projectedZero, projectedX, Scalar.Red);
             mFrame.Line(projectedZero, projectedY, Scalar.Green);
             mFrame.Line(projectedZero, projectedZ, Scalar.Blue);
@@ -138,7 +175,7 @@ namespace BrioTest
             else
             {
                 double scale = 1000;
-                string meterStr = " m";                
+                string meterStr = " m";
                 XPos = (-trVec[0] / scale).ToString() + meterStr;
                 YPos = (trVec[2] / scale).ToString() + meterStr;
                 ZPos = (-trVec[1] / scale).ToString() + meterStr;
@@ -178,6 +215,7 @@ namespace BrioTest
                 {
                     mFrame.Line(mImagePoints[0], mImagePoints[3], Scalar.Aquamarine);
                     mFrame.Line(mImagePoints[2], mImagePoints[3], Scalar.Aquamarine);
+
                     Process();
                 }
                 if (pointsNum > 1)
@@ -193,45 +231,5 @@ namespace BrioTest
                 Cv2.WaitKey(33);
             }
         }
-
-        //I wanted automatically detect paper list, but it is non-trivial task.
-        //There are many ways do it automatically. 
-        //The simpliest is to get paperlist contours by Canny or Threshold and morphological manipulations.
-        //Unfortunatly this methods uses "magic" coefficients which can be differ for some images.
-        //Therefore, I abandoned this idea.
-        private void PreProcess()
-        {
-            Mat gray = mFrame.CvtColor(ColorConversionCodes.BGR2GRAY);
-            Mat filtered = gray.BilateralFilter(11, 17, 17);
-            Mat thresh = filtered.Threshold(155, 255, ThresholdTypes.Binary);
-            Mat canny = thresh.Canny(10, 60);
-
-            Point[][] contours = new Point[][] { };
-            HierarchyIndex[] hierarchy = new HierarchyIndex[] { };
-
-            Cv2.FindContours(canny, out contours, out hierarchy, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
-
-            List<Point[]> rect = new List<Point[]>();
-            foreach (var item in contours)
-            {
-                var p = Cv2.ArcLength(item, true);
-                var approx = Cv2.ApproxPolyDP(item, 0.05 * p, true);
-
-                if (approx.Length == 4)
-                {
-                    rect.Add(approx);
-                }
-            }
-
-            OrderPoints();
-
-            for (int i = 0; i < rect.Count; i++)
-            {
-                Cv2.DrawContours(mFrame, rect, i, Scalar.Red);
-            }
-        }
-
-        private void OrderPoints()
-        { }
     }
 }
